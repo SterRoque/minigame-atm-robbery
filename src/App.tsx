@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { randomSequenceString } from './utils/utils';
 import { cn } from './utils/cn';
 
@@ -19,12 +19,40 @@ function App() {
       [],
    ) as { letter: string; matched: boolean | undefined }[];
    const [sequenceLetters, setSequenceLetters] = useState(sequenceLettersMemo);
-   const errorsCount = useRef(0);
+   const [time, setTime] = useState(100);
+   const [errors, setErrors] = useState(0);
+   const [gameOver, setGameOver] = useState(false);
 
    useEffect(() => {
-      document.addEventListener('keydown', (event) => {
-         if (errorsCount.current >= 3) {
-            alert('Game Over');
+      if (gameOver) {
+         alert('Game Over!');
+         return;
+      }
+
+      const duration = 5000;
+      const interval = 16;
+      const decrement = 100 / (duration / interval);
+
+      const timer = setInterval(() => {
+         setTime((prev) => {
+            const next = prev - decrement;
+
+            if (next <= 0) {
+               clearInterval(timer);
+               setGameOver(true);
+               return 0;
+            }
+
+            return next;
+         });
+      }, interval);
+      return () => clearInterval(timer);
+   }, [gameOver]);
+
+   useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+         if (gameOver) {
+            alert('Game Over!');
             return;
          }
 
@@ -33,29 +61,43 @@ function App() {
             (sequenceLetter) => !sequenceLetter.matched,
          );
 
-         if (noMatchedLetterIndex !== -1) {
-            const isMatchLetter =
-               sequenceLetters[noMatchedLetterIndex].letter === pressedKey;
+         if (noMatchedLetterIndex === -1) return;
 
-            if (!isMatchLetter && errorsCount.current < 3) {
-               console.log('no match');
-               errorsCount.current += 1;
+         const isMatchLetter =
+            sequenceLetters[noMatchedLetterIndex].letter === pressedKey;
+
+         if (!isMatchLetter) {
+            const nextErrors = errors + 1;
+            setErrors(nextErrors);
+
+            if (nextErrors >= 3) {
+               setGameOver(true);
             }
-
-            const updatedSequenceLetters = [...sequenceLetters];
-
-            updatedSequenceLetters[noMatchedLetterIndex].matched =
-               isMatchLetter;
-
-            setSequenceLetters(updatedSequenceLetters);
          }
-      });
-   }, []);
+
+         const updatedSequenceLetters = [...sequenceLetters];
+         updatedSequenceLetters[noMatchedLetterIndex] = {
+            ...updatedSequenceLetters[noMatchedLetterIndex],
+            matched: isMatchLetter,
+         };
+
+         setSequenceLetters(updatedSequenceLetters);
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+   }, [gameOver, sequenceLetters, errors]);
 
    return (
       <div className='flex h-screen w-screen items-center justify-center'>
          <div className='flex flex-col items-center gap-4 rounded-2xl bg-slate-800 p-8'>
-            <span className='text-slate-400'>{errorsCount.current} / 3</span>
+            <p className='text-xl font-bold text-white'>
+               Digite a sequencia correta
+            </p>
+            <span className='flex gap-1.5 self-end text-slate-400'>
+               Errors:{' '}
+               <span className='font-bold text-slate-200'>{errors} / 3</span>
+            </span>
             <div className='grid grid-cols-6 gap-2 rounded-2xl text-center text-2xl text-white'>
                {sequenceLetters.map((sequenceLetter, index) => {
                   return (
@@ -70,6 +112,15 @@ function App() {
                      </div>
                   );
                })}
+            </div>
+
+            <div className='w-full'>
+               <div className='h-2 w-full overflow-hidden rounded-full bg-zinc-700'>
+                  <div
+                     className='h-full bg-green-500 transition-[width] duration-75 ease-linear'
+                     style={{ width: `${time}%` }}
+                  />
+               </div>
             </div>
          </div>
       </div>
