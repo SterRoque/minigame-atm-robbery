@@ -93,6 +93,7 @@ function App() {
          if (success) {
             alert('Parabéns! Você completou a sequência!');
             setGameCompleted(true);
+            finishGame(gameCompleted);
             return;
          }
       };
@@ -100,6 +101,16 @@ function App() {
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
    }, [gameOver, gameCompleted, sequenceLetters, errors]);
+
+   const finishGame = async (result: boolean) => {
+      await fetch(`https://${GetParentResourceName()}/finishGame`, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ success: result }),
+      });
+   };
 
    return (
       <div className='flex h-screen w-screen items-center justify-center'>
