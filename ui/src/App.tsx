@@ -22,6 +22,7 @@ function App() {
    const [time, setTime] = useState(100);
    const [errors, setErrors] = useState(0);
    const [gameOver, setGameOver] = useState(false);
+   const [gameCompleted, setGameCompleted] = useState(false);
 
    useEffect(() => {
       if (gameOver) {
@@ -29,7 +30,9 @@ function App() {
          return;
       }
 
-      const duration = 5000;
+      if (gameCompleted) return;
+
+      const duration = 30000;
       const interval = 16;
       const decrement = 100 / (duration / interval);
 
@@ -47,7 +50,7 @@ function App() {
          });
       }, interval);
       return () => clearInterval(timer);
-   }, [gameOver]);
+   }, [gameOver, gameCompleted]);
 
    useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -82,11 +85,21 @@ function App() {
          };
 
          setSequenceLetters(updatedSequenceLetters);
+
+         const success = updatedSequenceLetters.every(
+            (sequenceLetter) => sequenceLetter.matched === true,
+         );
+
+         if (success) {
+            alert('Parabéns! Você completou a sequência!');
+            setGameCompleted(true);
+            return;
+         }
       };
 
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
-   }, [gameOver, sequenceLetters, errors]);
+   }, [gameOver, gameCompleted, sequenceLetters, errors]);
 
    return (
       <div className='flex h-screen w-screen items-center justify-center'>
