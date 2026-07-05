@@ -27,7 +27,8 @@ function App() {
 
    useEffect(() => {
       if (gameOver) {
-         alert('Game Over!');
+         finishGame(false);
+         setVisible(false);
          return;
       }
 
@@ -56,7 +57,6 @@ function App() {
    useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
          if (gameOver) {
-            alert('Game Over!');
             return;
          }
 
@@ -92,9 +92,9 @@ function App() {
          );
 
          if (success) {
-            alert('Parabéns! Você completou a sequência!');
             setGameCompleted(true);
-            finishGame(gameCompleted);
+            setVisible(false);
+            finishGame(true);
             return;
          }
       };
@@ -105,9 +105,16 @@ function App() {
 
    useEffect(() => {
       const handleOpen = (event: MessageEvent) => {
-         console.log('Received message:', JSON.stringify(event, null, 2));
-         console.log('Received message data:', event.data.action);
          if (event.data.action === 'show') {
+            setSequenceLetters(
+               randomSequenceString(quantityLetters, allowedLetters)
+                  .split('')
+                  .map((letter) => ({ letter, matched: undefined })),
+            );
+            setTime(100);
+            setErrors(0);
+            setGameOver(false);
+            setGameCompleted(false);
             setVisible(true);
          }
 
