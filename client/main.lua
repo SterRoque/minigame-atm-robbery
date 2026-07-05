@@ -66,12 +66,56 @@ RegisterNUICallback('finishGame', function(data, cb)
 
   if data.success then
     print('plantando c4')
+    PlantC4()
   else
     QBCore.Functions.Notify('Você falhou em arrombar o ATM', 'error')
     isBusy = false
     plantedAtmIndex = nil
   end
 end)
+
+function PlantC4()
+  local ped = PlayerPedId()
+
+  TriggerServerEvent('atm-robbery:plantC4')
+
+  RequestAnimDict(Config.PlantAnim.dict)
+  while not HasAnimDictLoaded(Config.PlantAnim.dict) do Wait(0) end
+
+  TaskPlayAnim(ped, Config.PlantAnim.dict, Config.PlantAnim.name, 8.0, -8.0, Config.PlantAnim.duration, 0, 0, false,
+    false, false)
+  Wait(Config.PlantAnim.duration)
+  ClearPedTasks(ped)
+
+  QBCore.Functions.Notify('C4 plantado! Afaste-se!', 'primary')
+
+  local index = plantedAtmIndex
+  local coord = Config.Locations[index]
+
+  CreateThread(function()
+    local endTime = GetGameTimer() + Config.ExplosionDelay
+
+    while GetGameTimer() < endTime do
+      PlaySoundFromCoord(-1, 'Beep_Red', coord.x, coord.y, coord.z, "DLC_HEIST_HACKING_SNAKE_SOUNDS", false, 30, false)
+
+      local remaining = endTime - GetGameTimer()
+
+      if remaining < 3000 then
+        Wait(200)
+      elseif remaining < 7000 then
+        Wait(400)
+      else
+        Wait(1000)
+      end
+    end
+
+    AddExplosion(coord.x, coord.y, coord.z, 2, 1.0, true, false, 1.0)
+
+    collectableAtmIndex = index
+    isBusy = false
+    QBCore.Functions.Notify('Dinheiro pronto para coletar', 'success')
+  end)
+end
 
 function DrawText3D(coord, text)
   SetTextScale(0.35, 0.35)

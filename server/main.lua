@@ -14,3 +14,14 @@ QBCore.Functions.CreateCallback('atm-robbery:canStart', function(source, cb)
 
   cb(true)
 end)
+
+
+RegisterNetEvent('atm-robbery:plantC4', function()
+  local src = source
+  local Player = QBCore.Functions.GetPlayer(src)
+
+  if not Player then return end
+
+  Player.Functions.RemoveItem(Config.RequiredItem, 1)
+  TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[Config.RequiredItem], 'remove')
+end)
