@@ -8,18 +8,12 @@ version '1.0.0'
 lua54 'yes'
 
 client_scripts {
-  'client/**/*.lua',
-  'client/*.lua'
+  'client/main.lua',
 }
-
-server_scripts {
-  'server/**/*.lua',
-  'server/*.lua'
-}
-
 
 files {
-  'web/dist/**',
+  'ui/build/**',
+  'ui/build/index.html',
 }
 
-ui_page 'web/dist/index.html'
+ui_page 'ui/build/index.html'

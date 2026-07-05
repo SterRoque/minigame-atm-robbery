@@ -23,6 +23,7 @@ function App() {
    const [errors, setErrors] = useState(0);
    const [gameOver, setGameOver] = useState(false);
    const [gameCompleted, setGameCompleted] = useState(false);
+   const [visible, setVisible] = useState(false);
 
    useEffect(() => {
       if (gameOver) {
@@ -102,6 +103,23 @@ function App() {
       return () => document.removeEventListener('keydown', handleKeyDown);
    }, [gameOver, gameCompleted, sequenceLetters, errors]);
 
+   useEffect(() => {
+      const handleOpen = (event: MessageEvent) => {
+         console.log('Received message:', JSON.stringify(event, null, 2));
+         console.log('Received message data:', event.data.action);
+         if (event.data.action === 'show') {
+            setVisible(true);
+         }
+
+         if (event.data.action === 'hide') {
+            setVisible(false);
+         }
+      };
+
+      window.addEventListener('message', handleOpen);
+      return () => window.removeEventListener('message', handleOpen);
+   }, []);
+
    const finishGame = async (result: boolean) => {
       await fetch(`https://${GetParentResourceName()}/finishGame`, {
          method: 'POST',
@@ -111,6 +129,8 @@ function App() {
          body: JSON.stringify({ success: result }),
       });
    };
+
+   if (!visible) return null;
 
    return (
       <div className='flex h-screen w-screen items-center justify-center'>
