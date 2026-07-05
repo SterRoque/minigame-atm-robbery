@@ -5,7 +5,6 @@ local collectableAtmIndex = nil
 
 local DISTANCE_INTERACT = 2.0
 
-
 local function getNearbyATM()
   local pos = GetEntityCoords(PlayerPedId())
 
@@ -28,13 +27,13 @@ CreateThread(function()
         DrawText3D(coord, "[~g~E~w~] Coletar dinheiro")
 
         if IsControlJustReleased(0, 38) and not isBusy then
-          -- CollectMoney(index, coord)
+          CollectMoney(index, coord)
           print('coletando dinheiro')
         end
       elseif not isBusy then
         DrawText3D(coord, "[~g~G~w~] Roubar")
         if IsControlJustReleased(0, 47) then
-          StartRobbery(index, coord)
+          StartRobbery(index)
           print('iniciando o roubo')
         end
       end
@@ -43,7 +42,7 @@ CreateThread(function()
   end
 end)
 
-function StartRobbery(index, coord)
+function StartRobbery(index)
   isBusy = true
 
   QBCore.Functions.TriggerCallback('atm-robbery:canStart', function(canStart, reason)
@@ -56,7 +55,7 @@ function StartRobbery(index, coord)
     plantedAtmIndex = index
     SetNuiFocus(true, true)
     SendNUIMessage({ action = 'show' })
-  end, coord)
+  end, index)
 end
 
 RegisterNUICallback('finishGame', function(data, cb)
@@ -117,10 +116,32 @@ function PlantC4()
   end)
 end
 
+function CollectMoney(index, coord)
+  isBusy = true
+  local ped = PlayerPedId()
+
+  RequestAnimDict(Config.CollectAnim.dict)
+  while not HasAnimDictLoaded(Config.CollectAnim.dict) do Wait(0) end
+  TaskPlayAnim(ped, Config.CollectAnim.dict, Config.CollectAnim.name, 8.0, -8.0, -1, 1, 0, false, false, false)
+
+  QBCore.Functions.Progressbar('collect_atm', 'Coletando dinheiro...', Config.CollectDuration, false, true, {
+    disableMovement = true, disableCarMovement = true, disableMouse = false, disableCombat = true
+  }, {}, {}, {}, function()
+    ClearPedTasks(ped)
+    TriggerServerEvent('atm-robbery:collectReward', index)
+    collectableAtmIndex = nil
+    isBusy = false
+  end, function()
+    ClearPedTasks(ped)
+    isBusy = false
+    QBCore.Functions.Notify('Você cancelou', 'error')
+  end)
+end
+
 function DrawText3D(coord, text)
   SetTextScale(0.35, 0.35)
   SetTextFont(4)
-  SetTextProportional(1)
+  SetTextProportional(true)
   SetTextColour(255, 255, 255, 215)
   SetTextEntry('STRING')
   SetTextCentre(true)

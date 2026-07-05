@@ -15,8 +15,8 @@ Config.PlantAnim = {
   duration = 4000,
 }
 Config.CollectAnim = {
-  dict = 'mini@repair',
-  name = 'fixing_a_ped',
+  dict = 'anim@heists@ornate_bank@grab_cash',
+  name = 'grab',
 }
 
 Config.Locations = {
