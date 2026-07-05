@@ -20,5 +20,7 @@ Config.CollectAnim = {
 }
 
 Config.Locations = {
-  vector3(24.55, -946.07, 29.36)
+  vector3(24.55, -946.07, 29.36),
+  vector3(119.32, -883.6, 31.12),
+  vector3(289.03, -1256.8, 29.44)
 }
