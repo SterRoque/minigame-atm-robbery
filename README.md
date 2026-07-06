@@ -54,11 +54,6 @@ Tudo em [`shared/config.lua`](shared/config.lua):
 | `Config.PlantAnim` / `Config.CollectAnim` | Animações                   |
 | `Config.Locations`                        | Coordenadas dos ATMs        |
 
-## Comandos de debug
-
-- `/atmcoords` — mostra sua coordenada atual (para adicionar em `Config.Locations`)
-- `/tpatm` — teleporta até o primeiro ATM configurado
-
 ## Estrutura
 
 ```
