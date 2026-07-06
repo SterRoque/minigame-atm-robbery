@@ -67,6 +67,7 @@ RegisterNUICallback('finishGame', function(data, cb)
     print('plantando c4')
     PlantC4()
   else
+    TriggerServerEvent('atm-robbery:plantC4')
     QBCore.Functions.Notify('Você falhou em arrombar o ATM', 'error')
     isBusy = false
     plantedAtmIndex = nil
