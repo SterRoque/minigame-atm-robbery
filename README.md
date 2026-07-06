@@ -1,6 +1,6 @@
 # ATM Robbery
 
-![ATM Robbery](https://imgur.com/a/A5hbRkw)
+![ATM Robbery](https://i.imgur.com/nHtGpwD.png)
 
 Este recurso para **FiveM** implementa um sistema de **roubo a caixas eletrônicos (ATM)** para servidores QBCore. O jogador usa um **C4** para arrombar o ATM, completa um minigame, explode o caixa e coleta o dinheiro em **notas marcadas**. A estrutura do projeto é organizada em três partes principais: `server`, `client` e `ui`, cada uma responsável por uma camada da aplicação.
 
